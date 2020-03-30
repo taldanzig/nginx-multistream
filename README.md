@@ -1,6 +1,8 @@
 # nginx-multistream
 
-Multiplex a livestream to both YouTube and Facebook Live using nginx in a container
+Multiplex a rtmp stream to both YouTube and Facebook Live using nginx in a container. This makes use of (NGINX)[https://www.nginx.com/], the (NGINX RTMP module)[https://github.com/arut/nginx-rtmp-module], and [FFmpeg](https://www.ffmpeg.org/).
+
+This was cobbled together from instructions on the (OBS project forum)[https://obsproject.com/forum/resources/how-to-set-up-your-own-private-rtmp-server-using-nginx.50/] as well as a guide on (Vultr)[https://www.vultr.com/docs/setup-nginx-rtmp-on-ubuntu-14-04]. I have Dockerized the installation of nginx, ffmpeg, and the rtmp modules using an Ubuntu Xenial (18.04) base, nginx 1.17.9, and ffmpeg4.
 
 ## Notes
 
