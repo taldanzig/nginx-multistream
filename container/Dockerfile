@@ -46,5 +46,7 @@ WORKDIR /opt/multistream
 RUN apt-get clean
 RUN rm -rf /build
 
+COPY nginx.conf /usr/local/nginx/conf/
+
 EXPOSE 1935 8080
 CMD ["/usr/local/nginx/sbin/nginx"]

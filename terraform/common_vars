@@ -1,0 +1,14 @@
+# NOTE this file has been written to be both a valid shell source file as well
+# as a Make source file.
+
+# Define the region where terraform state S3 bucket should live in
+AWS_DEFAULT_REGION=us-west-2
+AWS_REGION=us-west-2
+
+# Configure AWS credentials
+AWS_PROFILE=tal-personal
+
+# Account ID where the resources should live in
+AWS_ACCOUNT_ID=445070157823
+
+export AWS_REGION AWS_PROFILE
