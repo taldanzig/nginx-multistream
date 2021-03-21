@@ -23,7 +23,7 @@ stat.xsl:
 
 docker-run:
 	docker run \
-		-p 1935:1935 -p 8080:8080 \
+		-p 1935:1935 -p 8080:8080 -p 8888:8888 \
 		--mount type=bind,source=$(CURDIR)/nginx.conf,target=/usr/local/nginx/conf/nginx.conf \
 		-it \
 		nginx-multistream:latest
