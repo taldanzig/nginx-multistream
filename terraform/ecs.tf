@@ -55,20 +55,32 @@ resource "aws_ecs_service" "multiplexer" {
   name                               = "multiplexer"
   cluster                            = aws_ecs_cluster.multiplexer.id
   task_definition                    = aws_ecs_task_definition.multiplexer.arn
-  desired_count                      = 0
+  desired_count                      = 1
   launch_type                        = "FARGATE"
   deployment_maximum_percent         = 100
   deployment_minimum_healthy_percent = 0
 
   network_configuration {
-    subnets = var.subnet_ids
+    subnets = local.subnet_ids
 
     security_groups = [
       aws_security_group.multiplexer.id,
+      aws_security_group.egress.id,
+      aws_security_group.ingress.id,
     ]
 
     assign_public_ip = true
   }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.rtmp.arn
+    container_name   = "multiplexer"
+    container_port   = local.rtmp_port
+  }
+
+  depends_on = [
+    aws_lb.lb,
+  ]
 }
 
 resource "aws_ecs_task_definition" "multiplexer" {
@@ -85,7 +97,7 @@ resource "aws_ecs_task_definition" "multiplexer" {
   {
     "portMappings": [
       {
-        "containerPort": 8080
+        "containerPort": ${local.rtmp_port}
       }
     ],
     "logConfiguration": {

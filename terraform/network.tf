@@ -1,21 +1,27 @@
 resource "aws_security_group" "multiplexer" {
   name        = "multiplexer"
-  description = "Allow egress"
-  vpc_id      = var.vpc_id
+  description = "multiplexer ports"
+  vpc_id      = aws_default_vpc.default.id
 
   ingress {
-    from_port = 1935
-    to_port = 1935
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port = local.rtmp_port
+    to_port   = local.rtmp_port
+    protocol  = "tcp"
+    self      = true
   }
 
   ingress {
     from_port = 8080
-    to_port = 8080
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    to_port   = 8080
+    protocol  = "tcp"
+    self      = true
   }
+}
+
+resource "aws_security_group" "egress" {
+  name        = "egress-all"
+  description = "allow egress"
+  vpc_id      = aws_default_vpc.default.id
 
   egress {
     from_port   = 0
@@ -25,3 +31,15 @@ resource "aws_security_group" "multiplexer" {
   }
 }
 
+resource "aws_security_group" "ingress" {
+  name        = "ingress-rtmp"
+  description = "allow ingress"
+  vpc_id      = aws_default_vpc.default.id
+
+  ingress {
+    from_port = local.rtmp_port
+    to_port   = local.rtmp_port
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
