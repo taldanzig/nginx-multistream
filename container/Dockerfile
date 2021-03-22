@@ -1,28 +1,21 @@
 # Based on instructions here: https://www.vultr.com/docs/setup-nginx-rtmp-on-ubuntu-14-04
-# Using Ubuntu 18.04 (bionic)
+# Using Ubuntu 20.04 (focal)
 
-FROM ubuntu:bionic
+FROM ubuntu:focal AS build
 
-RUN apt-get update
+ENV DEBIAN_FRONTEND noninteractive
 
-# https://launchpad.net/~savoury1/+archive/ubuntu/ffmpeg4
-RUN apt-get -y install software-properties-common
-RUN add-apt-repository ppa:savoury1/graphics
-RUN add-apt-repository ppa:savoury1/multimedia
-RUN add-apt-repository ppa:savoury1/ffmpeg4
-RUN add-apt-repository ppa:savoury1/build-tools
-RUN add-apt-repository ppa:savoury1/backports
-
-RUN apt-get update
-RUN apt-get -y dist-upgrade
-RUN apt-get -y install build-essential \
-	libpcre3 \
-	libpcre3-dev \
-	libssl-dev \
-	zlib1g-dev \
-	unzip
-
-RUN apt-get -y install ffmpeg
+RUN apt-get update \
+	&& apt-get -y dist-upgrade \
+	&& apt-get -y install build-essential \
+		libpcre3 \
+		libpcre3-dev \
+		libssl-dev \
+		zlib1g-dev \
+	unzip \
+	ffmpeg \
+	&& apt-get clean \
+	&& rm -rf /var/cache/apt
 
 WORKDIR /build
 
@@ -34,19 +27,31 @@ COPY nginx-rtmp-module.zip .
 RUN tar -xf nginx.tar.gz
 RUN unzip nginx-rtmp-module.zip
 
-RUN cd nginx-${NGINX_VERSION} && ./configure --with-http_ssl_module --add-module=../nginx-rtmp-module-master
-RUN cd nginx-${NGINX_VERSION} && make
-RUN cd nginx-${NGINX_VERSION} && make install
+RUN cd nginx-${NGINX_VERSION} \
+	&& ./configure --with-http_ssl_module --add-module=../nginx-rtmp-module-master \
+	&& make \
+	&& make install \
+	&& rm -rf /build
 
 COPY stat.xsl /opt/multistream/stat.xsl/stat.xsl
 RUN chmod -R a+r /opt/multistream
 
-WORKDIR /opt/multistream
+FROM ubuntu:focal
 
-RUN apt-get clean
-RUN rm -rf /build
+ENV DEBIAN_FRONTEND noninteractive
 
-COPY nginx.conf /usr/local/nginx/conf/
+RUN apt-get update \
+	&& apt-get -y dist-upgrade \
+	&& apt-get -y install \
+	ffmpeg \
+	&& apt-get clean \
+	&& rm -rf /var/cache/apt /var/lib/apt/lists/*
+
+COPY --from=build /usr/local/nginx/ /usr/local/nginx/
+
+COPY nginx.conf.in /usr/local/nginx/conf/
+COPY start.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/start.sh
 
 EXPOSE 1935 8080
-CMD ["/usr/local/nginx/sbin/nginx"]
+CMD ["/usr/local/bin/start.sh"]

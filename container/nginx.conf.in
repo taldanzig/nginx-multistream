@@ -22,7 +22,7 @@ rtmp {
             on_publish http://localhost:8888/auth;
 
             # For YouTube
-            push rtmp://a.rtmp.youtube.com/live2/YOUTUBE_KEY ;
+            push rtmp://a.rtmp.youtube.com/live2/__YOUTUBE_KEY__ ;
 
             # For Facebook. Facebook can only do 720p30 and requires rtmps
             exec ffmpeg -i rtmp://localhost/$app/$name
@@ -30,17 +30,21 @@ rtmp {
                 -vf scale=-1:720 
                 -vcodec libx264 -pix_fmt yuv420p -r 30 -g 60 
                 -maxrate 3000k -bufsize 9000k -preset veryfast 
-                -f flv "rtmps://live-api-s.facebook.com:443/rtmp/FB_KEY" ;
+                -f flv "rtmps://live-api-s.facebook.com:443/rtmp/__FB_KEY__" ;
         }
 
         application multiplx-reflect1 {
             live on;
             record off;
+
+            on_publish http://localhost:8888/auth;
         }
 
         application multiplx-reflect2 {
             live on;
             record off;
+            
+            on_publish http://localhost:8888/auth;
         }
     }
 }
@@ -51,7 +55,7 @@ http {
         listen 8888;
 
         location /auth {
-            if ($arg_name ~ 'totallysecretpassword') {
+            if ($arg_name ~ '__PASSWORD__') {
                 return 201;
             }
             return 404;

@@ -23,7 +23,9 @@ stat.xsl:
 
 docker-run:
 	docker run \
+		--rm \
 		-p 1935:1935 -p 8080:8080 -p 8888:8888 \
-		--mount type=bind,source=$(CURDIR)/nginx.conf,target=/usr/local/nginx/conf/nginx.conf \
+		--mount type=bind,source=$(CURDIR)/nginx.conf.in,target=/usr/local/nginx/conf/nginx.conf.in \
 		-it \
+		--env YOUTUBE_KEY --env FB_KEY --env PASSWORD \
 		nginx-multistream:latest
