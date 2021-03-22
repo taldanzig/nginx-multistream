@@ -55,7 +55,7 @@ resource "aws_ecs_service" "multiplexer" {
   name                               = "multiplexer"
   cluster                            = aws_ecs_cluster.multiplexer.id
   task_definition                    = aws_ecs_task_definition.multiplexer.arn
-  desired_count                      = 1
+  desired_count                      = 0
   launch_type                        = "FARGATE"
   deployment_maximum_percent         = 100
   deployment_minimum_healthy_percent = 0
@@ -109,7 +109,22 @@ resource "aws_ecs_task_definition" "multiplexer" {
       }
     },
     "environment": [
-      { "name": "SERVICE_NAME", "value": "multiplexer" }
+      {
+        "name": "SERVICE_NAME",
+        "value": "multiplexer"
+      },
+      {
+        "name": "YOUTUBE_KEY",
+        "value": "${var.youtube_key}"
+      },
+      {
+        "name": "FB_KEY",
+        "value": "${var.fb_key}"
+      },
+      {
+        "name": "PASSWORD",
+        "value": "${var.password}"
+      }
     ],
     "image": "${aws_ecr_repository.multiplexer.repository_url}",
     "essential": true,

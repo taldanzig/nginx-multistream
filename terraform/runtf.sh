@@ -3,6 +3,9 @@
 set -ue
 
 source $( dirname "${BASH_SOURCE[0]}" )/common_vars
+if [ -f extra_vars ]; then
+  source extra_vars
+fi
 
 export AWS_PROFILE=$AWS_PROFILE                                         \
  TF_VAR_aws_region=$AWS_DEFAULT_REGION                                  \
