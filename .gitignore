@@ -1,3 +1,5 @@
 *.zip
 *.tar.gz
 stat.xsl
+.terraform
+.terraform.lock.hcl
