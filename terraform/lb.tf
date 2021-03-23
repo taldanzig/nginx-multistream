@@ -79,7 +79,7 @@ resource "aws_route53_record" "lb" {
   count = local.service_enabled
 
   zone_id = data.aws_route53_zone.aws_zone.id
-  name    = "rtmp.talandyael.com"
+  name    = "rtmp.${var.domain}"
   type    = "A"
 
   alias {

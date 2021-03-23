@@ -34,3 +34,8 @@ variable "container_count" {
   description = "Container count"
   default     = 0
 }
+
+variable "domain" {
+  type = string
+  description = "The domain to attach to. Zone must already exist in Route53"
+}
