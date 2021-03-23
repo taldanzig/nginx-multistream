@@ -52,10 +52,12 @@ resource "aws_cloudwatch_log_group" "multiplexer_logs" {
 }
 
 resource "aws_ecs_service" "multiplexer" {
+  count = local.service_enabled
+
   name                               = "multiplexer"
   cluster                            = aws_ecs_cluster.multiplexer.id
   task_definition                    = aws_ecs_task_definition.multiplexer.arn
-  desired_count                      = 0
+  desired_count                      = var.container_count
   launch_type                        = "FARGATE"
   deployment_maximum_percent         = 100
   deployment_minimum_healthy_percent = 0
@@ -73,13 +75,13 @@ resource "aws_ecs_service" "multiplexer" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.rtmp.arn
+    target_group_arn = aws_lb_target_group.rtmp[0].arn
     container_name   = "multiplexer"
     container_port   = local.rtmp_port
   }
 
   depends_on = [
-    aws_lb.lb,
+    aws_lb.lb[0],
   ]
 }
 

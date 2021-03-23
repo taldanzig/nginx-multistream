@@ -7,6 +7,8 @@ locals {
   ]
 
   rtmp_port = 1935
+
+  service_enabled = var.container_count > 0 ? 1 : 0
 }
 
 resource "aws_default_vpc" "default" {
@@ -30,8 +32,8 @@ resource "aws_default_subnet" "default_az4" {
 
 
 resource "aws_security_group" "lb_ingress" {
-  vpc_id      = aws_default_vpc.default.id
-  name        = "Load Balancer Ingress"
+  vpc_id = aws_default_vpc.default.id
+  name   = "Load Balancer Ingress"
 
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
@@ -42,12 +44,16 @@ resource "aws_security_group" "lb_ingress" {
 }
 
 resource "aws_lb" "lb" {
+  count = local.service_enabled
+
   name               = "lb"
   load_balancer_type = "network"
   subnets            = local.subnet_ids
 }
 
 resource "aws_lb_target_group" "rtmp" {
+  count = local.service_enabled
+
   name              = "rtmp-target"
   port              = local.rtmp_port
   protocol          = "TCP"
@@ -57,12 +63,28 @@ resource "aws_lb_target_group" "rtmp" {
 }
 
 resource "aws_lb_listener" "rtmp" {
-  load_balancer_arn = aws_lb.lb.id
+  count = local.service_enabled
+
+  load_balancer_arn = aws_lb.lb[0].id
   port              = local.rtmp_port
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.rtmp.arn
+    target_group_arn = aws_lb_target_group.rtmp[0].arn
+  }
+}
+
+resource "aws_route53_record" "lb" {
+  count = local.service_enabled
+
+  zone_id = data.aws_route53_zone.aws_zone.id
+  name    = "rtmp.talandyael.com"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.lb[0].dns_name
+    zone_id                = aws_lb.lb[0].zone_id
+    evaluate_target_health = false
   }
 }

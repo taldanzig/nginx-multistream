@@ -15,16 +15,22 @@ variable "aws_profile" {
 }
 
 variable "youtube_key" {
-  type = string
+  type        = string
   description = "YouTube stream key"
 }
 
 variable "fb_key" {
-  type = string
+  type        = string
   description = "Facebook stream key"
 }
 
 variable "password" {
-  type = string
+  type        = string
   description = "Streaming password"
+}
+
+variable "container_count" {
+  type        = number
+  description = "Container count"
+  default     = 0
 }

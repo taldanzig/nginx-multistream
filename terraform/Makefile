@@ -15,3 +15,11 @@ docker-push:
 	set -uxe ;\
 	docker tag nginx-multistream:latest $(REMOTE)/multiplexer:latest ;\
 	docker push $(REMOTE)/multiplexer:latest
+
+apply-enable:
+	export TF_VAR_container_count=1 ;\
+		./runtf.sh apply
+
+apply-disable:
+	export TF_VAR_container_count=0 ;\
+		./runtf.sh apply
